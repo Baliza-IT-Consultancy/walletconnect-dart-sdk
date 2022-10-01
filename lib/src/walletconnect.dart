@@ -244,6 +244,8 @@ class WalletConnect {
 
     await _sendResponse(response);
     session.connected = true;
+    session.chainId = chainId;
+    session.accounts = accounts;
 
     // Notify listeners
     _eventBus.fire(Event<SessionStatus>(
@@ -375,18 +377,18 @@ class WalletConnect {
 
   /// Kill the current session.
   /// https://docs.walletconnect.com/client-api#kill-session-disconnect
-  Future killSession({String? sessionError}) async {
+  Future killSession({
+    String? sessionError,
+  }) async {
     final message = sessionError ?? 'Session disconnected';
-
     final request = JsonRpcRequest(
       id: payloadId,
       method: 'wc_sessionUpdate',
       params: [
         {
           'approved': false,
-          'chainId': null,
-          'networkId': null,
-          'accounts': null,
+          'chainId': session.chainId,
+          'accounts': session.accounts,
         }
       ],
     );
